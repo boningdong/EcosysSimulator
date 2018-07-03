@@ -1,8 +1,8 @@
 from World import World
 import tkinter
 
-GAME_WIDTH = 1024
-GAME_HEIGHT = 768
+GAME_WIDTH = 800
+GAME_HEIGHT = 600
 
 SHEEP_COLOR = "#abe9ee"
 WOLF_COLOR = "#ec5d62"
@@ -30,7 +30,7 @@ class Frame:
     def GameLoop(self):
         self.Update()
         self.Render()
-        self.frame.after(10, self.GameLoop)
+        self.frame.after(2, self.GameLoop)
 
     def Update(self):
         self.world.Update()

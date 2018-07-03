@@ -2,7 +2,6 @@ import random
 import math
 from Utilities import Timer
 
-
 class Animal:
     def __init__(self, width, height, x = None, y = None):
         # World Information
@@ -15,15 +14,15 @@ class Animal:
         self.hungerRate = 1
         self.maxFood = 100
         self.hungerThreshold = 80
-        self.boostFactor = random.randrange(13, 17) / 10.0
+        self.boostFactor = random.randrange(10, 12) / 10.0
         self.hungerFactor = self.boostFactor ** (1/1.5)
         self.pregProbability = 0.7
-        self.maxAge = 30
+        self.maxAge = 40
         self.matureAge = 5
         self.alertRange = 40
         self.desireThreshold = 60
         self.maxDesire = 100
-        self.desireRate = 20
+        self.desireRate = 30
 
 
         # Stauts
@@ -155,6 +154,10 @@ class Wolf (Animal):
     def __init__(self, width, height, x = None, y = None):
         Animal.__init__(self, width, height, x, y)
         # Wolf Status
+        self.maxAge = 60
+        self.pregProbability = 0.3
+        self.boostFactor = random.randrange(13, 15) / 10.0
+        self.desireRate = 15
         self.target = None
 
     def Update(self, dt):
