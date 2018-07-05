@@ -30,7 +30,7 @@ class Frame:
     def GameLoop(self):
         self.Update()
         self.Render()
-        self.frame.after(2, self.GameLoop)
+        self.frame.after(10, self.GameLoop)
 
     def Update(self):
         self.world.Update()

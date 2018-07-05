@@ -1,11 +1,12 @@
 from Entities import *
 from Utilities import Timer, Point
 
-INIT_SHEEPS_NUM = 50
+INIT_SHEEPS_NUM = 30
 INIT_WOLF_NUM = 10
 
 MAP_X_BLOCK = 40
 MAP_Y_BLOCK = 30
+FOOD_RANGE = 50
 
 def SetInRange(x0, x1, val):
     if x0 <= val < x1:
@@ -112,6 +113,7 @@ class World:
 
         for s in self.sheeps:
             s.Update(1 / self.fps)
+            s.EatGrass(1 / self.fps, len(self.mapManager.GetObjectsInRanger(s.x, s.y, FOOD_RANGE)['Sheeps']))
             self.Reposition(s)
             self.mapManager.SaveObject(s)
 
@@ -126,31 +128,15 @@ class World:
                 if s.danger == None and \
                 self.DistanceBetween(s, wolf) < s.alertRange:
                     s.Escape(wolf)
+                    break
 
         # Sheep mate
         newSheeps = []
-        """
-        for i in range(len(self.sheeps)):
-            for k in range(i+1, len(self.sheeps)):
-                s1 = self.sheeps[i]
-                if not s1.isDesireStrong():
-                    s1.mateTarget = None
-                    break
-                # if it already has a target in range, then stick with the target.
-                if s1.mateTarget != None:
-                    if s1.CheckDistanceTo(s1.mateTarget) < self.mateRange:
-                        ss = s1.Mate(s1.mateTarget)
-                        if ss != None:
-                            newSheeps.append(ss)
-                    break
-                # if it has no target, then locate a new target.
-                s2 = self.sheeps[k]
-                if s1.CheckDistanceTo(s2) < s1.alertRange and s2.isMature:
-                    print ("[Sheep] => Located mate target!") # DEBUG
-                    s1.mateTarget = s2
-        """
         for s1 in self.sheeps:
             for s2 in self.mapManager.GetObjectsInRanger(s1.x, s1.y, s1.alertRange)['Sheeps']:
+                if s1 == s2:
+                    break
+
                 if not s1.isDesireStrong():
                     s1.mateTarget = None
                     break
@@ -175,6 +161,8 @@ class World:
                 if wolf.target == None and \
                 self.DistanceBetween(sheep, wolf) < wolf.alertRange and not sheep.dead:
                     wolf.Chase(sheep)
+                    break
+
                 # If the target within the range, eat
                 if wolf.CheckSheepDistance() != None and \
                 wolf.CheckSheepDistance() < self.huntRange and sheep.dead != True:
@@ -182,26 +170,11 @@ class World:
 
         # Wolves mate
         newWolves = []
-        """
-        for i in range(len(self.wolfs)):
-            for k in range(i+1, len(self.wolfs)):
-                w1 = self.wolfs[i]
-                if not w1.isDesireStrong():
-                    break
-                #  if it already has a target in range, then stick with the target.
-                if w1.mateTarget != None:
-                    if w1.CheckDistanceTo(w1.mateTarget) < self.mateRange and w1.isDesireStrong():
-                        ww  = w1.Mate(w1.mateTarget)
-                        if ww != None:
-                            newWolves.append(ww)
-                # if it has no mate target, then locate a new target.
-                w2 = self.wolfs[k]
-                if w1.CheckDistanceTo(w2) < w1.alertRange and w2.isMature:
-                    print ("[Wolf] => Located mate target!") # DEBUG
-                    w1.mateTarget = w2
-        """
         for w1 in self.wolfs:
             for w2 in self.mapManager.GetObjectsInRanger(w1.x, w1.y, w1.alertRange)['Wolfs']:
+                if w1 == w2:
+                    break
+
                 if not w1.isDesireStrong():
                     w1.mateTarget = None
                     break

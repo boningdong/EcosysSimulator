@@ -3,7 +3,7 @@ import math
 from Utilities import Timer
 
 class Animal:
-    def __init__(self, width, height, x = None, y = None):
+    def __init__(self, width, height, x = None, y = None, food = None):
         # World Information
         self.worldWidth = width
         self.worldHeight = height
@@ -11,25 +11,25 @@ class Animal:
         # Animal Attributes
         self.size = 10
         # - Parameters
-        self.hungerRate = 1
+        self.hungerRate = 10
         self.maxFood = 100
         self.hungerThreshold = 80
         self.boostFactor = random.randrange(10, 12) / 10.0
         self.hungerFactor = self.boostFactor ** (1/1.5)
-        self.pregProbability = 0.7
+        self.pregProbability = 0.75
         self.maxAge = 40
-        self.matureAge = 5
+        self.matureAge = 3
         self.alertRange = 40
-        self.desireThreshold = 60
+        self.desireThreshold = 30
         self.maxDesire = 100
-        self.desireRate = 30
+        self.desireRate = 50
 
 
         # Stauts
         # - Location
         self.x = x if x != None else random.randrange(0, width)
         self.y = y if y != None else random.randrange(0, height)
-        self.v = random.randrange(20, 40)
+        self.v = random.randrange(35, 45)
         self.angle = random.randrange(0, 180) / math.pi
         # - Target
         self.tx = random.randrange(0, self.worldWidth)
@@ -38,7 +38,8 @@ class Animal:
         # - Status
         self.dead = False
         self.isMature = False
-        self.food = 100
+        self.food = 85 if food == None else food
+        print("Food => {}".format(self.food))
         self.age = 0
         self.desire = 0
 
@@ -90,7 +91,7 @@ class Animal:
         target.mateTarget = None
         self.desire = 0
         self.mateTarget = None
-
+        self.food - 5
 
     def isHunger(self):
         return self.food < self.hungerThreshold
@@ -100,10 +101,12 @@ class Animal:
 
 
 class Sheep (Animal):
-    def __init__(self, width, height, x = None, y = None):
-        Animal.__init__(self, width, height, x, y)
+    def __init__(self, width, height, x = None, y = None, food = None):
+        Animal.__init__(self, width, height, x, y, food)
 
         # Sheep Attributes
+        self.hungerRate = 30
+        self.lowFoodThreshold = 50
         self.foodValue = random.randrange(3, 8)
 
         # Sheep Status
@@ -113,13 +116,14 @@ class Sheep (Animal):
         Animal.Update(self, dt)
         # Non danger status
         if self.danger == None:
-            if self.mateTarget == None:
+            if self.mateTarget == None or self.food < self.lowFoodThreshold:
                 # No mate target
                 if (self.GetTargetDistance() < self.v):
                     self.NewTarget()
                 self.MoveToTarget()
                 self.x += self.v * math.cos(self.angle) * dt
                 self.y += self.v * math.sin(self.angle) * dt
+                # print("Food Drop => {}".format(self.hungerRate * dt)) # DEBUG
                 self.food -= self.hungerRate * dt
             else:
                 # has mate target
@@ -139,10 +143,20 @@ class Sheep (Animal):
         # Check death
         if self.food <= 0 or self.age > self.maxAge: self.dead = True
 
+    def EatGrass(self, dt, sheepNum):
+        # print("sheepNum => {}".format(sheepNum))
+        sheepNum = sheepNum - 5 if sheepNum - 5 > 0 else 0
+         #print("Food Gain => {}".format(10 * dt * math.exp(- sheepNum))) # DEBUG
+        self.food += self.hungerRate * 2.71 ** (- sheepNum) * dt * 1.1
+        self.food = self.maxFood if self.food > self.maxFood else self.food
+
     def Mate(self, s):
         Animal.Mate(self, s)
         if random.random() < self.pregProbability:
-            return Sheep(self.worldWidth, self.worldHeight, self.x, self.y)
+            return Sheep(
+                self.worldWidth, self.worldHeight,
+                self.x, self.y,
+                (s.food + self.food) / 2)
         else:
             return None
 
@@ -154,16 +168,18 @@ class Wolf (Animal):
     def __init__(self, width, height, x = None, y = None):
         Animal.__init__(self, width, height, x, y)
         # Wolf Status
-        self.maxAge = 60
-        self.pregProbability = 0.3
+        self.maxAge *= 2
+        self.pregProbability = 0.7
         self.boostFactor = random.randrange(13, 15) / 10.0
+        self.huntRange = 20
+        self.lowFoodThreshold = 50
         self.desireRate = 15
         self.target = None
 
     def Update(self, dt):
         Animal.Update(self, dt)
         if self.target == None:
-            if self.mateTarget == None:
+            if self.mateTarget == None or self.food < self.lowFoodThreshold:
                 if (self.GetTargetDistance() < self.v):
                     self.NewTarget()
                 self.MoveToTarget()
@@ -183,7 +199,7 @@ class Wolf (Animal):
     def Mate(self, w):
         Animal.Mate(self, w)
         if random.random() < self.pregProbability:
-            print("Wolf mate success")
+            # print("Wolf mate success")
             return Wolf(self.worldWidth, self.worldHeight, self.x, self.y)
         else:
             return None
