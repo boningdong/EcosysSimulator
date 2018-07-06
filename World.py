@@ -1,8 +1,8 @@
 from Entities import *
 from Utilities import Timer, Point
 
-INIT_SHEEPS_NUM = 30
-INIT_WOLF_NUM = 10
+INIT_SHEEPS_NUM = 40
+INIT_WOLF_NUM = 15
 
 MAP_X_BLOCK = 40
 MAP_Y_BLOCK = 30
@@ -180,10 +180,12 @@ class World:
                     break
                 #  if it already has a target in range, then stick with the target.
                 if w1.mateTarget != None:
-                    if w1.CheckDistanceTo(w1.mateTarget) < self.mateRange and w1.isDesireStrong():
+                    if w1.CheckDistanceTo(w1.mateTarget) < self.mateRange:
                         ww  = w1.Mate(w1.mateTarget)
                         if ww != None:
                             newWolves.append(ww)
+                    break
+                    
                 # if it has no mate target, then locate a new target.
                 if w1.CheckDistanceTo(w2) < w1.alertRange and w2.isMature:
                     print ("[Wolf] => Located mate target!") # DEBUG

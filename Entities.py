@@ -39,7 +39,7 @@ class Animal:
         self.dead = False
         self.isMature = False
         self.food = 85 if food == None else food
-        print("Food => {}".format(self.food))
+        # print("Food => {}".format(self.food))
         self.age = 0
         self.desire = 0
 
@@ -107,7 +107,7 @@ class Sheep (Animal):
         # Sheep Attributes
         self.hungerRate = 30
         self.lowFoodThreshold = 50
-        self.foodValue = random.randrange(3, 8)
+        self.foodValue = random.randrange(25, 30)
 
         # Sheep Status
         self.danger = None
@@ -168,12 +168,14 @@ class Wolf (Animal):
     def __init__(self, width, height, x = None, y = None):
         Animal.__init__(self, width, height, x, y)
         # Wolf Status
-        self.maxAge *= 2
-        self.pregProbability = 0.7
-        self.boostFactor = random.randrange(13, 15) / 10.0
+        self.maxAge *= 1.5
+        self.pregProbability = 0.9
+        self.boostFactor = random.randrange(17, 20) / 10.0
+        self.hungerRate = 15
         self.huntRange = 20
+        self.alertRange = 60
         self.lowFoodThreshold = 50
-        self.desireRate = 15
+        self.desireRate = 30
         self.target = None
 
     def Update(self, dt):
